@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% include "header.html" %}
+
+{% block title %} Home {% endblock %}
+
+{% block body %}
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="jumbotron">
+          <h2>Manage
+            <b>Employees</b>
+            <button
+              type="button"
+              class="btn btn-success float-right"
+              data-toggle="modal"
+              data-target="#modalAddEmployee"
+            >
+              Add New Employees
+            </button>
+          </h2>
+          <table class="table table-hover table-dark">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="employeeTable">
+              {% for employee in employees %}
+                  <tr>
+                    <td>{{ employee.id }}</td>
+                    <td>{{ employee.name }}</td>
+                    <td>{{ employee.email }}</td>
+                    <td>{{ employee.phone }}</td>
+                    <td>
+                      <a href="" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modalEdit">Edit</a>
+                      <a href="#" class="btn btn-danger btn-xs" onclick="return confirm('Are you sure to delete this!')">Delete</a>
+                    </td>
+                  </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- <div class="modal fade" id="modalAddEmployee" tabindex="-1" role="dialog" aria-labelledby="modalAddEmployeeLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalAddEmployeeLabel">Add New Employee</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone:</label>
+            <input type="text" class="form-control" id="phone" name="phone" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+
+
+  <div class="modal fade" id="modalAddEmployee" tabindex="-1" role="dialog" aria-labelledby="modalAddEmployee" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalAddEmployee">Edit Employee</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form action="" id="employeeForm">
+          <div class="modal-body">
+            <input type="hidden" name="id" id="id">
+            <div class="form-group">
+              <label for="name">Name:</label>
+              <input type="text" class="form-control" id="name" name="name" value="" required>
+            </div>
+            <div class="form-group">
+              <label for="email">Email:</label>
+              <input type="email" class="form-control" id="email" name="email" value="" required>
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone:</label>
+              <input type="text" class="form-control" id="phone" name="phone" value="" required>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script>
+      $('body').on('click', '.edit-button', function() {
+        var employeeId = $(this).attr('data-id');
+        $.ajax({
+          url: `/read/${employeeId}`,
+          method: 'GET',
+          success: function(response) {
+            var employee = response;
+            $('#name').val(employee.name);
+            $('#email').val(employee.email);
+            $('#phone').val(employee.phone);
+            $('#modalAddEmployeeLabel').attr('data-id', employeeId);
+            $('#modalAddEmployee').modal('show');
+          },
+          error: function(xhr, status, error) {
+            console.error(error);
+          }
+        });
+      });
+  </script>
+
+{% endblock %}
