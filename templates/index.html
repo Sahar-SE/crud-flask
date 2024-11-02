@@ -1,8 +1,157 @@
 {% extends "base.html" %}
+{% include "header.html" %}
 
 {% block title %} Home {% endblock %}
 
 {% block body %}
-    <h1>Home</h1>
-    <p>Welcome to the home page!</p>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="jumbotron">
+          <h2>Manage
+            <b>Employees</b>
+            <button
+              type="button"
+              class="btn btn-success float-right"
+              data-toggle="modal"
+              data-target="#modalAddEmployee"
+            >
+              Add New Employees
+            </button>
+          </h2>
+          <table class="table table-hover table-dark">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="employeeTable">
+              {% for employee in employees %}
+                  <tr>
+                    <td>{{ employee.id }}</td>
+                    <td>{{ employee.name }}</td>
+                    <td>{{ employee.email }}</td>
+                    <td>{{ employee.phone }}</td>
+                    <td>
+                      <a href="/update/{{employee.id}}" class="btn btn-warning btn-xs edit-button"  data-id="${{ employee.id }}" data-toggle="modal" data-target="#modalEdit{{employee.id}}" onclick="editUser(1)">Edit</a>
+                      <a href="#" class="btn btn-danger btn-xs delete-button" data-id="${employee.id}" onclick="return confirm('Are you sure to delete this!')">Delete</a>
+                    </td>
+                  </tr>
+
+                    <!-- Edit Modal -->
+                <div class="modal fade" id="modalEdit{{employee.id}}" tabindex="-1" role="dialog" aria-labelledby="modalEditLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h5 class="modal-title" id="modalEditLabel">Edit Employee</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                              </button>
+                          </div>
+                          <form action="{{url_for('update')}}" method="post" id="editForm">
+                              <input type="hidden" name="id" id="editEmployeeId" value="{{employee.id}}">
+                              <div class="form-group">
+                                  <label for="name">Name:</label>
+                                  <input type="text" class="form-control" id="editEmployeeName" name="name" value="{{employee.name}}" required>
+                              </div>
+                              <div class="form-group">
+                                  <label for="email">Email:</label>
+                                  <input type="email" class="form-control" id="editEmployeeEmail" name="email" value="{{employee.email}}" required>
+                              </div>
+                              <div class="form-group">
+                                  <label for="phone">Phone:</label>
+                                  <input type="text" class="form-control" id="editEmployeePhone" name="phone" value="{{employee.phone}}" required>
+                              </div>
+                              <button type="submit" class="btn btn-primary">Update</button>
+                          </form>
+                      </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <div class="modal fade" id="modalAddEmployee" tabindex="-1" role="dialog" aria-labelledby="modalAddEmployeeLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalAddEmployeeLabel">New Employee</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form action="/create" method="post" id="employeeForm">
+          <div class="modal-body">
+            <input type="hidden" name="id" id="id">
+            <div class="form-group">
+              <label for="name">Name:</label>
+              <input type="text" class="form-control" id="name" name="name" value="" required>
+            </div>
+            <div class="form-group">
+              <label for="email">Email:</label>
+              <input type="email" class="form-control" id="email" name="email" value="" required>
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone:</label>
+              <input type="text" class="form-control" id="phone" name="phone" value="" required>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" id="saveButton">Save changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+
+  <script>
+    $(document).ready(function() { 
+      // Function to load employee data
+      function loadEmployees() {
+        console.log("Loading employees...");
+        $.ajax({
+          url: '/',
+          method: 'GET',
+          success: function(response) {
+            console.log("Employees loaded:", response);
+            var employees = response;
+            var tableBody = $('#employeeTable');
+            tableBody.empty();
+            $.each(employees, function(index, employee) {
+              tableBody.append(`
+                <tr>
+                  <td>${employee.id}</td>
+                  <td>${employee.name}</td>
+                  <td>${employee.email}</td>
+                  <td>${employee.phone}</td>
+                  <td>
+                    <button class="btn btn-warning btn-xs edit-button" data-id="${employee.id}">Edit</button>
+                    <button class="btn btn-danger btn-xs delete-button" data-id="${employee.id}">Delete</button>
+                  </td>
+                </tr>
+              `);
+            });
+          },
+        });
+      }
+
+      // Load employees initially
+      loadEmployees();
+
+    });
+  </script>
+
 {% endblock %}
